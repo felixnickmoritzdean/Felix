@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Religion Quiz – Kleidung & Gegenstände</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root { --saffron: #E8871A; --gold: #F5C842; --cream: #FDF6E3; --ink: #1A1208; --muted: #8B7355; --correct: #2E8B5A; --wrong: #C0392B; --bg: #0F0A04; --hindu: #B5451B; --hindu-gold: #F0A500; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--cream); min-height: 100vh; padding: 0 0 60px; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse at 20% 20%, rgba(232,135,26,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(123,30,42,0.12) 0%, transparent 50%); pointer-events: none; z-index: 0; }
+
+  /* HOME SCREEN */
+  .home { position: relative; z-index: 1; text-align: center; padding: 60px 24px; }
+  .home-title { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 900; color: var(--gold); text-shadow: 0 0 40px rgba(245,200,66,0.3); margin-bottom: 8px; }
+  .home-sub { font-size: 0.9rem; color: var(--muted); margin-bottom: 48px; }
+  .quiz-cards { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; max-width: 700px; margin: 0 auto; }
+  .quiz-card { flex: 1; min-width: 240px; max-width: 300px; border-radius: 20px; padding: 36px 24px; cursor: pointer; transition: all 0.25s; border: 2px solid transparent; text-align: center; }
+  .quiz-card:hover { transform: translateY(-4px); }
+  .quiz-card.buddhism { background: rgba(232,135,26,0.08); border-color: rgba(232,135,26,0.3); }
+  .quiz-card.buddhism:hover { border-color: var(--saffron); background: rgba(232,135,26,0.15); }
+  .quiz-card.hinduism { background: rgba(181,69,27,0.08); border-color: rgba(181,69,27,0.3); }
+  .quiz-card.hinduism:hover { border-color: var(--hindu); background: rgba(181,69,27,0.15); }
+  .card-icon { font-size: 3.5rem; margin-bottom: 16px; display: block; }
+  .card-title { font-size: 1.4rem; font-weight: 900; margin-bottom: 8px; }
+  .quiz-card.buddhism .card-title { color: var(--gold); }
+  .quiz-card.hinduism .card-title { color: var(--hindu-gold); }
+  .card-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+  .card-btn { display: inline-block; padding: 10px 24px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer; font-family: 'Outfit', sans-serif; transition: all 0.2s; }
+  .quiz-card.buddhism .card-btn { background: var(--saffron); color: var(--ink); }
+  .quiz-card.hinduism .card-btn { background: var(--hindu); color: #fff; }
+  .card-lb-btn { display: inline-block; margin-top: 8px; padding: 7px 18px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; border: 1.5px solid var(--muted); cursor: pointer; font-family: 'Outfit', sans-serif; background: transparent; color: var(--cream); transition: all 0.2s; }
+  .card-lb-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* QUIZ SCREEN */
+  header { position: relative; text-align: center; padding: 32px 24px 24px; border-bottom: 2px solid rgba(232,135,26,0.3); z-index: 1; display: none; }
+  header.show { display: block; }
+  .back-btn { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); background: transparent; border: 1.5px solid var(--muted); color: var(--cream); border-radius: 8px; padding: 7px 14px; font-size: 0.8rem; cursor: pointer; font-family: 'Outfit', sans-serif; }
+  .back-btn:hover { border-color: var(--saffron); color: var(--saffron); }
+  .subtitle { font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 8px; }
+  .subtitle.b { color: var(--saffron); }
+  .subtitle.h { color: var(--hindu); }
+  h1 { font-size: clamp(1.4rem, 4vw, 2.2rem); font-weight: 900; line-height: 1.1; color: var(--gold); }
+  h1 span.b { color: var(--saffron); }
+  h1 span.h { color: var(--hindu-gold); }
+  main { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 40px 20px 0; display: none; }
+  main.show { display: block; }
+  .controls { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+  button { padding: 10px 24px; border-radius: 6px; font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
+  .btn-primary-b { background: var(--saffron); color: var(--ink); }
+  .btn-primary-b:hover { background: var(--gold); }
+  .btn-primary-h { background: var(--hindu); color: #fff; }
+  .btn-primary-h:hover { background: var(--hindu-gold); color: var(--ink); }
+  .btn-secondary { background: transparent; border: 1.5px solid var(--muted); color: var(--cream); }
+  .btn-secondary:hover { border-color: var(--saffron); color: var(--saffron); }
+  .quiz-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .q-counter { font-size: 0.8rem; color: var(--muted); }
+  .score-badge { background: rgba(232,135,26,0.15); border: 1px solid var(--saffron); border-radius: 20px; padding: 4px 14px; font-size: 0.85rem; color: var(--gold); font-weight: 700; }
+  .progress-bar { width: 100%; height: 3px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-bottom: 32px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--saffron), var(--gold)); border-radius: 3px; transition: width 0.4s ease; }
+  .progress-fill.h { background: linear-gradient(90deg, var(--hindu), var(--hindu-gold)); }
+  .question-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(232,135,26,0.2); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+  .question-card.h { border-color: rgba(181,69,27,0.3); }
+  .question-text { font-family: 'Noto Serif', serif; font-size: clamp(1rem, 2.5vw, 1.3rem); line-height: 1.55; }
+  .answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 540px) { .answers-grid { grid-template-columns: 1fr; } }
+  .answer-btn { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--cream); font-size: 0.95rem; text-align: left; cursor: pointer; transition: all 0.18s; line-height: 1.3; font-family: 'Outfit', sans-serif; font-weight: 400; }
+  .answer-btn:hover:not(:disabled) { border-color: var(--saffron); background: rgba(232,135,26,0.08); transform: translateY(-1px); }
+  .answer-btn .letter { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.12); font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
+  .answer-btn.correct { border-color: var(--correct); background: rgba(46,139,90,0.15); }
+  .answer-btn.correct .letter { background: var(--correct); border-color: var(--correct); color: #fff; }
+  .answer-btn.wrong { border-color: var(--wrong); background: rgba(192,57,43,0.12); opacity: 0.7; }
+  .answer-btn.wrong .letter { background: var(--wrong); border-color: var(--wrong); color: #fff; }
+  .answer-btn:disabled { cursor: default; }
+  .feedback-box { border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; font-size: 0.95rem; display: none; align-items: flex-start; gap: 10px; line-height: 1.5; }
+  .feedback-box.show { display: flex; }
+  .feedback-box.correct-fb { background: rgba(46,139,90,0.15); border: 1px solid rgba(46,139,90,0.4); color: #7FD4A8; }
+  .feedback-box.wrong-fb { background: rgba(192,57,43,0.12); border: 1px solid rgba(192,57,43,0.35); color: #E88882; }
+  .next-btn { width: 100%; padding: 14px; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; display: none; transition: all 0.2s; font-family: 'Outfit', sans-serif; }
+  .next-btn.show { display: block; }
+  .next-btn.b { background: var(--saffron); color: var(--ink); }
+  .next-btn.b:hover { background: var(--gold); }
+  .next-btn.h { background: var(--hindu); color: #fff; }
+  .next-btn.h:hover { background: var(--hindu-gold); color: var(--ink); }
+  .result-screen { text-align: center; padding: 40px 20px; }
+  .result-icon { font-size: 5rem; margin-bottom: 24px; display: block; }
+  .result-screen h2 { font-size: 2rem; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
+  .result-score { font-size: 3.5rem; font-weight: 900; color: var(--saffron); margin: 16px 0; }
+  .result-msg { color: var(--muted); font-size: 1rem; margin-bottom: 24px; font-family: 'Noto Serif', serif; font-style: italic; }
+  .name-input-box { margin: 20px auto; max-width: 400px; }
+  .name-input-box label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .name-input-box input { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(232,135,26,0.4); border-radius: 8px; color: var(--cream); font-family: 'Outfit', sans-serif; font-size: 1rem; outline: none; }
+  .name-input-box input:focus { border-color: var(--saffron); }
+  .leaderboard { margin-top: 8px; }
+  .lb-title { font-size: 1.1rem; font-weight: 900; color: var(--gold); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; justify-content: center; }
+  .lb-empty { color: var(--muted); font-size: 0.9rem; font-style: italic; text-align: center; padding: 20px; }
+  .lb-item { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 10px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); }
+  .lb-item.rank-1 { background: rgba(245,200,66,0.1); border-color: rgba(245,200,66,0.3); }
+  .lb-item.rank-2 { background: rgba(192,192,192,0.08); border-color: rgba(192,192,192,0.2); }
+  .lb-item.rank-3 { background: rgba(205,127,50,0.08); border-color: rgba(205,127,50,0.2); }
+  .lb-rank { font-size: 1.2rem; width: 30px; text-align: center; flex-shrink: 0; }
+  .lb-name { flex: 1; font-weight: 700; font-size: 0.95rem; }
+  .lb-score { font-weight: 900; color: var(--saffron); font-size: 1rem; }
+  .lb-pct { font-size: 0.75rem; color: var(--muted); margin-left: 4px; }
+  .lb-loading { text-align: center; color: var(--muted); font-size: 0.9rem; padding: 20px; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="home" id="home">
+  <div class="home-title">🙏 Religion Quiz</div>
+  <p class="home-sub">Wähle ein Thema aus</p>
+  <div class="quiz-cards">
+    <div class="quiz-card buddhism">
+      <span class="card-icon">☸</span>
+      <div class="card-title">Buddhismus</div>
+      <p class="card-desc">Mönchsroben, Ritualgegenstände, Symbole und mehr – 25 Fragen</p>
+      <button class="card-btn" onclick="initQuiz('buddhism')">▶ Quiz starten</button><br>
+      <button class="card-lb-btn" onclick="initLeaderboard('buddhism')">🏆 Bestenliste</button>
+    </div>
+    <div class="quiz-card hinduism">
+      <span class="card-icon">🕉</span>
+      <div class="card-title">Hinduismus</div>
+      <p class="card-desc">Sari, Dhoti, Puja-Gegenstände, Symbole und mehr – 25 Fragen</p>
+      <button class="card-btn" onclick="initQuiz('hinduism')">▶ Quiz starten</button><br>
+      <button class="card-lb-btn" onclick="initLeaderboard('hinduism')">🏆 Bestenliste</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ HEADER -->
+<header id="quiz-header">
+  <button class="back-btn" onclick="goHome()">← Zurück</button>
+  <div class="subtitle" id="hdr-subtitle"></div>
+  <h1 id="hdr-title"></h1>
+</header>
+
+<!-- QUIZ MAIN -->
+<main id="quiz-main">
+  <div id="main-content"></div>
+</main>
+
+<script>
+const MEDALS = ['🥇','🥈','🥉'];
+const LETTERS = ['A','B','C','D'];
+const BIN = {
+  buddhism: { id: '6a0edbf9ee5a733b12f632c3', key: '$2a$10$QuIgyYUjVCaW3k1lu99X4OtVftpfSmgoCH.nKO/N5chl7WHh9ol5m' },
+  hinduism:  { id: '6a169b138ef04f45382037a8', key: '$2a$10$QuIgyYUjVCaW3k1lu99X4OtVftpfSmgoCH.nKO/N5chl7WHh9ol5m' }
+};
+
+const QUIZZES = {
+  buddhism: {
+    icon: '☸', label: 'Buddhismus', sublabel: '☸ Kahoot-Fragen', color: 'b',
+    msg: (p) => p===100?'„Der Weg des Wissens ist eröffnet." – Vollkommenes Ergebnis!':p>=80?'„Weisheit wächst Schritt für Schritt." – Ausgezeichnet!':p>=60?'„Auch der längste Weg beginnt mit dem ersten Schritt." – Gut gemacht!':p>=40?'„Ausdauer ist der Weg zur Erleuchtung." – Weitermachen!':'„Anfängergeist ist der beste Geist." – Übe weiter!',
+    questions: [
+      { q: "Welche Farbe haben die Roben der buddhistischen Mönche in Südostasien traditionell?", opts: ["Safrangelb / Orange","Weiß","Blau","Schwarz"], a: 0, exp: "In Theravāda-Ländern wie Thailand tragen Mönche safrangelbe Roben (Kāsāya)." },
+      { q: "Wie heißt das dreigeteilte Mönchsgewand im Theravāda-Buddhismus?", opts: ["Trikāya","Tīcīvara","Kāsāya","Rakusu"], a: 1, exp: "Das Tīcīvara besteht aus Untergewand, Obergewand und Mantel." },
+      { q: "Was ist ein Rakusu im Zen-Buddhismus?", opts: ["Ein Gebetsbuch","Eine kleine Robe um den Hals","Ein Meditationskissen","Eine Gebetskette"], a: 1, exp: "Das Rakusu ist ein kleines Gewand, das nach der Jukai-Zeremonie um den Hals getragen wird." },
+      { q: "Wie viele Perlen hat ein buddhistischer Rosenkranz (Mālā)?", opts: ["54","99","108","72"], a: 2, exp: "Die Mālā hat 108 Perlen – eine heilige Zahl im Buddhismus." },
+      { q: "Wie heißt die Bettelschale der Mönche?", opts: ["Pātra","Stūpa","Thangka","Vajra"], a: 0, exp: "Der Pātra ist die Almosenschale der Mönche." },
+      { q: "Was ist ein Stūpa?", opts: ["Ein Mönchsgewand","Ein Meditationsmantra","Ein Reliquienbauwerk","Ein Ritualwerkzeug"], a: 2, exp: "Ein Stūpa ist ein buddhistisches Bauwerk, das Reliquien enthält." },
+      { q: "Welches Instrument wird in Klöstern zur Meditation genutzt?", opts: ["Sitar","Klangschale","Tabla","Bongos"], a: 1, exp: "Tibetische Klangschalen werden für Meditation und Rituale genutzt." },
+      { q: "Was symbolisiert der Vajra (Donnerkeil)?", opts: ["Mitgefühl","Unzerstörbarkeit und erleuchtenden Geist","Reichtum","Reinheit"], a: 1, exp: "Der Vajra steht für die Unzerstörbarkeit des erleuchteten Geistes." },
+      { q: "Wie heißt die rituelle Glocke, die mit dem Vajra verwendet wird?", opts: ["Mālā","Thangka","Ghanta","Gyaling"], a: 2, exp: "Die Ghanta (Glocke) repräsentiert Weisheit." },
+      { q: "Was ist ein Thangka?", opts: ["Ein tibetisches Rollbild","Ein Gebetstuch","Ein Kochbuch","Ein Meditationssitz"], a: 0, exp: "Thangkas sind tibetische Rollbilder mit religiösen Motiven." },
+      { q: "Welche Farbe tragen tibetische Mönche meist?", opts: ["Weiß und Gold","Dunkelrot / Bordeaux","Grün und Blau","Schwarz und Silber"], a: 1, exp: "Tibetische Mönche tragen dunkelrote Roben." },
+      { q: "Was ist ein Mandala?", opts: ["Ein Klostergebäude","Ein heiliges geometrisches Diagramm","Eine Bettelschale","Ein Mantra"], a: 1, exp: "Ein Mandala symbolisiert das Universum als geometrisches Diagramm." },
+      { q: "Wie heißt das tibetische Gebetsrad?", opts: ["Mani-Khor","Stupā","Pātra","Rakusu"], a: 0, exp: "Das Mani-Khor enthält eine Mantrarolle; jede Umdrehung gilt als Rezitation." },
+      { q: "Was steht auf Gebetsrädern und Gebetsfahnen?", opts: ["Om mani padme hum","Namo Amida Butsu","Gate gate pāragate","Anicca vatta sankhara"], a: 0, exp: "'Om mani padme hum' ist das wichtigste Mantra im tibetischen Buddhismus." },
+      { q: "Was halten Theravāda-Mönche bei Zeremonien vor das Gesicht?", opts: ["Talapatra (Palmblattfächer)","Khakkhara","Hossu","Chowrie"], a: 0, exp: "Der Talapatra ist ein Fächer aus Palmblatt." },
+      { q: "Was ist ein Khakkhara?", opts: ["Eine Mönchsglocke","Ein Pilgerstab mit klingelnden Ringen","Ein Meditationskissen","Ein Ritualkelch"], a: 1, exp: "Der Khakkhara ist ein Pilgerstab mit Metallringen." },
+      { q: "Was ist der Hossu?", opts: ["Ein Schwert","Ein Staubbesen aus Tierhaaren","Ein Gebetsbuch","Ein Kōan-Buch"], a: 1, exp: "Der Hossu ist ein ritueller Staubbesen, den Zen-Meister tragen." },
+      { q: "Welche Farbe tragen japanische Zen-Mönche?", opts: ["Orange","Schwarz","Weiß","Grau"], a: 1, exp: "Japanische Mönche tragen schwarze oder graue Roben (Koromo)." },
+      { q: "Was ist ein Kesa?", opts: ["Ein zeremonielles Schultertuch","Ein Meditationssitz","Ein Gebetsstock","Ein Tempel-Gong"], a: 0, exp: "Das Kesa ist ein aus Flicken genähtes Schultertuch." },
+      { q: "Was symbolisiert der Lotus (Padma)?", opts: ["Leiden","Reinheit und Erleuchtung trotz Schmutz","Reichtum","Zorn"], a: 1, exp: "Der Lotus wächst aus dem Schlamm – Symbol für Erleuchtung." },
+      { q: "Wie heißt das Kleidungsstück buddh. Laien in Myanmar?", opts: ["Longyi","Dhoti","Sarong","Kurta"], a: 0, exp: "Der Longyi ist ein gewickeltes Tuch in Myanmar." },
+      { q: "Was ist ein Sand-Mandala?", opts: ["Ein bemaltes Tuch","Ein aus Sand gelegtes Mandala das aufgelöst wird","Ein Reliquiar","Eine Klosteranlage"], a: 1, exp: "Das Sand-Mandala wird nach Fertigstellung aufgelöst – Symbol der Vergänglichkeit." },
+      { q: "Was sind Gebetsfahnen (Lungta)?", opts: ["Fahnen mit Mantras die der Wind verbreitet","Dekoration ohne Bedeutung","Prozessionsfahnen","Fahnen für Verstorbene"], a: 0, exp: "Lungta sind Fahnen mit Mantras; der Wind verbreitet die Gebete." },
+      { q: "Was gehört NICHT zu den Acht Glückssymbolen (Ashtamangala)?", opts: ["Endloser Knoten","Lotusblüte","Vajra (Donnerkeil)","Goldene Fische"], a: 2, exp: "Der Vajra gehört nicht zu den Ashtamangala." },
+      { q: "Wozu dienen die Hörner (Dungchen) in tibetischen Klöstern?", opts: ["Kommunikation","Begleitung von Zeremonien","Vertreiben böser Geister","Rangabzeichen"], a: 1, exp: "Die Dungchen sind lange Kupferhörner für Zeremonien." }
+    ]
+  },
+  hinduism: {
+    icon: '🕉', label: 'Hinduismus', sublabel: '🕉 Kahoot-Fragen', color: 'h',
+    msg: (p) => p===100?'„Das Wissen des Brahman ist vollkommen." – Perfektes Ergebnis!':p>=80?'„Der Dharma führt zur Erleuchtung." – Ausgezeichnet!':p>=60?'„Auch Krishna lernte Schritt für Schritt." – Gut gemacht!':p>=40?'„Beharrlichkeit ist der Weg zum Ziel." – Weitermachen!':'„Auch der längste Weg beginnt mit Om." – Übe weiter!',
+    questions: [
+      { q: "Wie heißt das traditionelle Kleidungsstück der hinduistischen Frauen?", opts: ["Sari","Dhoti","Kurta","Lunghi"], a: 0, exp: "Der Sari ist ein 5–9 Meter langes Tuch, das kunstvoll um den Körper gewickelt wird." },
+      { q: "Wie heißt das traditionelle Gewand hinduistischer Männer, das um die Hüfte gewickelt wird?", opts: ["Sari","Dhoti","Sherwani","Turban"], a: 1, exp: "Der Dhoti ist ein weißes Baumwolltuch, das um Hüfte und Beine gewickelt wird." },
+      { q: "Was ist ein Tilaka?", opts: ["Ein Schmuckstück am Ohr","Eine farbige Markierung auf der Stirn","Ein Gebetstuch","Ein rituelles Armband"], a: 1, exp: "Der Tilaka ist eine Markierung auf der Stirn aus Asche, Sandel oder farbiger Paste." },
+      { q: "Wie viele Perlen hat ein hinduistischer Rudraksha-Rosenkranz?", opts: ["54","99","108","72"], a: 2, exp: "Der Rudraksha-Mālā hat 108 Perlen – die heilige Zahl im Hinduismus." },
+      { q: "Was ist eine Murti?", opts: ["Ein heiliger Text","Eine Gottheitsfigur aus Stein oder Metall","Ein Gebetstuch","Ein Tempel"], a: 1, exp: "Eine Murti ist eine Figur einer Gottheit, vor der Gläubige beten und Opfergaben bringen." },
+      { q: "Was ist eine Diya?", opts: ["Ein Räucherstäbchen","Eine kleine Öllampe aus Ton","Ein Blumenopfer","Ein Gebetstuch"], a: 1, exp: "Die Diya ist eine kleine Öllampe, die bei Puja-Zeremonien und Diwali entzündet wird." },
+      { q: "Was ist eine Trishula?", opts: ["Ein heiliger Fluss","Der Dreizack des Gottes Shiva","Ein Meditationssitz","Ein Musikinstrument"], a: 1, exp: "Die Trishula ist der Dreizack Shivas und symbolisiert seine drei Aspekte: Schöpfer, Erhalter, Zerstörer." },
+      { q: "Was ist ein Shankha?", opts: ["Ein Tempelgong","Ein Conch-Horn (Muschelhorn)","Ein Räuchergefäß","Ein Blumenopfer"], a: 1, exp: "Das Shankha ist ein heiliges Muschelhorn, das bei Zeremonien geblasen wird." },
+      { q: "Was symbolisiert das Om-Zeichen (ॐ) im Hinduismus?", opts: ["Den Gott Vishnu","Den Urklang des Universums","Den heiligen Fluss Ganges","Die Göttin Lakshmi"], a: 1, exp: "Om (ॐ) gilt als der Urklang des Universums und ist das wichtigste Symbol im Hinduismus." },
+      { q: "Wie heißt das Tablett mit Ritualgegenstanden für die Puja-Zeremonie?", opts: ["Puja-Thali","Mandala-Teller","Karma-Schale","Dharma-Brett"], a: 0, exp: "Die Puja-Thali enthält Blumen, Diya, Räucherstäbchen, Wasser und andere Opfergaben." },
+      { q: "Welche Farbe ist im Hinduismus besonders heilig und wird bei Zeremonien getragen?", opts: ["Blau","Schwarz","Safrangelb / Orange","Grün"], a: 2, exp: "Safrangelb/Orange ist die heilige Farbe im Hinduismus und steht für Reinheit und Opferbereitschaft." },
+      { q: "Was ist ein Bindi?", opts: ["Ein Schmuckstein oder Punkt zwischen den Augenbrauen","Ein Armreif","Ein Fußschmuck","Ein Halsband"], a: 0, exp: "Der Bindi ist ein farbiger Punkt auf der Stirn zwischen den Augenbrauen, traditionell ein Zeichen der Verheiratung." },
+      { q: "Wie heißt der heilige Fluss, in dem Hindus rituell baden?", opts: ["Nil","Ganges (Ganga)","Euphrat","Indus"], a: 1, exp: "Der Ganges (Ganga) ist der heiligste Fluss im Hinduismus; ein Bad soll Sünden reinigen." },
+      { q: "Was ist ein Rudraksha?", opts: ["Ein heiliger Baum","Eine Perle aus Samen des Rudraksha-Baums für Gebetsketten","Ein Tempeltanz","Ein Opferfeuer"], a: 1, exp: "Rudraksha-Perlen stammen vom Elaeocarpus-Baum und gelten als heilig für Gebetsketten." },
+      { q: "Was ist ein Namaste-Gruß?", opts: ["Ein Handschlag","Das Zusammenführen beider Handflächen vor der Brust","Eine Verbeugung bis zum Boden","Ein Umarmung"], a: 1, exp: "Namaste bedeutet 'Ich verbeuge mich vor dem Göttlichen in dir' und wird mit zusammengelegten Händen ausgeführt." },
+      { q: "Was ist ein Dhoop?", opts: ["Eine Art Tanz","Ein Räucherstäbchen oder Räucherwerk","Ein Gebetstuch","Ein Musikinstrument"], a: 1, exp: "Dhoop ist Räucherwerk, das bei Puja-Zeremonien verbrannt wird um die Götter anzurufen." },
+      { q: "Welches Tier gilt im Hinduismus als heilig?", opts: ["Elefant","Schlange","Kuh","Alle drei"], a: 3, exp: "Kuh, Elefant und Schlange gelten alle als heilig – die Kuh als Symbol der Muttergottheit, der Elefant als Ganesha, die Schlange als Symbol Shivas." },
+      { q: "Was ist ein Kurta?", opts: ["Ein langes hemdartiges Obergewand","Ein Wickeltuch","Ein Kopfschmuck","Ein Schuhwerk"], a: 0, exp: "Der Kurta ist ein langes, hemdartig geschnittenes Obergewand für Männer und Frauen." },
+      { q: "Was ist ein Kalash?", opts: ["Ein Tempelturm","Ein mit Wasser gefüllter Tonkrug für Rituale","Ein Musikinstrument","Ein Gebetstuch"], a: 1, exp: "Der Kalash ist ein heiliger Tonkrug mit Wasser, Blättern und einer Kokosnuss, der bei Zeremonien verwendet wird." },
+      { q: "Was symbolisiert die Lotusblume im Hinduismus?", opts: ["Krieg und Stärke","Reinheit, Schönheit und göttliche Vollkommenheit","Trauer und Verlust","Reichtum und Macht"], a: 1, exp: "Der Lotus symbolisiert Reinheit und göttliche Vollkommenheit – viele Götter sitzen auf einem Lotus." },
+      { q: "Was ist ein Mangalsutra?", opts: ["Ein heiliges Buch","Eine Halskette die ein verheirateter Mann seiner Frau anlegt","Ein Tempelopfer","Ein rituelles Bad"], a: 1, exp: "Das Mangalsutra ist eine schwarze und goldene Halskette, die der Bräutigam der Braut bei der Hochzeit anlegt." },
+      { q: "Wie heißt das traditionelle Hochzeitsgewand der hinduistischen Braut?", opts: ["Weißer Sari","Roter oder pinker Sari","Schwarzes Gewand","Blaues Kleid"], a: 1, exp: "Die hinduistische Braut trägt traditionell einen roten oder pinkfarbenen Sari, da Rot Glück und Fruchtbarkeit symbolisiert." },
+      { q: "Was ist Sindoor?", opts: ["Ein Gewürz","Ein rotes Pulver das verheiratete Frauen im Scheitel tragen","Ein Räucherwerk","Ein Blumenopfer"], a: 1, exp: "Sindoor ist rotes Puder, das verheiratete Hindu-Frauen im Haaransatz als Zeichen ihrer Ehe tragen." },
+      { q: "Was ist ein Yantra?", opts: ["Ein Tanz","Ein geometrisches Diagramm zur Meditation und Verehrung von Gottheiten","Ein Musikinstrument","Ein Gebetstuch"], a: 1, exp: "Ein Yantra ist ein geometrisches Diagramm, ähnlich dem Mandala, das zur Meditation und Gottesverehrung genutzt wird." },
+      { q: "Was ist Vibhuti?", opts: ["Eine Gottheit","Heilige Asche die auf den Körper aufgetragen wird","Ein Gebet","Ein Tempel"], a: 1, exp: "Vibhuti ist heilige Asche, die Shiva-Gläubige auf Stirn und Körper auftragen als Zeichen der Vergänglichkeit." }
+    ]
+  }
+};
+
+let currentQuiz = null, currentQ = 0, score = 0;
+
+function goHome() {
+  document.getElementById('home').style.display = 'block';
+  document.getElementById('quiz-header').classList.remove('show');
+  document.getElementById('quiz-main').classList.remove('show');
+}
+
+function initQuiz(type) {
+  currentQuiz = type;
+  currentQ = 0;
+  score = 0;
+  const q = QUIZZES[type];
+  document.getElementById('home').style.display = 'none';
+  const hdr = document.getElementById('quiz-header');
+  hdr.classList.add('show');
+  document.getElementById('hdr-subtitle').textContent = q.sublabel;
+  document.getElementById('hdr-subtitle').className = 'subtitle ' + q.color;
+  document.getElementById('hdr-title').innerHTML = `${q.label}:<br><span class="${q.color}">Gegenstände & Kleidung</span>`;
+  document.getElementById('quiz-main').classList.add('show');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUIZZES[currentQuiz];
+  const qData = q.questions[currentQ];
+  const pct = (currentQ / q.questions.length) * 100;
+  document.getElementById('main-content').innerHTML = `
+    <div class="quiz-header">
+      <span class="q-counter">Frage ${currentQ+1} von ${q.questions.length}</span>
+      <span class="score-badge">✦ ${score} Punkte</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill ${q.color}" style="width:${pct}%"></div></div>
+    <div class="question-card ${q.color}"><p class="question-text">${qData.q}</p></div>
+    <div class="answers-grid">
+      ${qData.opts.map((o,i) => `
+        <button class="answer-btn" onclick="selectAnswer(${i})" id="opt-${i}">
+          <span class="letter">${LETTERS[i]}</span><span>${o}</span>
+        </button>`).join('')}
+    </div>
+    <div class="feedback-box" id="feedback"></div>
+    <button class="next-btn ${q.color}" id="next-btn" onclick="nextQuestion()">
+      ${currentQ < q.questions.length-1 ? 'Nächste Frage →' : 'Ergebnis anzeigen'}
+    </button>`;
+}
+
+function selectAnswer(idx) {
+  const qData = QUIZZES[currentQuiz].questions[currentQ];
+  document.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
+  const isCorrect = idx === qData.a;
+  if (isCorrect) score++;
+  document.querySelectorAll('.answer-btn').forEach((b,i) => {
+    if (i === qData.a) b.classList.add('correct');
+    else if (i === idx && !isCorrect) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback-box show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+  fb.innerHTML = `<span class="feedback-icon">${isCorrect ? '✓' : '✗'}</span>
+    <span>${isCorrect ? '<strong>Richtig!</strong> ' : '<strong>Falsch.</strong> Richtige Antwort: <em>'+qData.opts[qData.a]+'</em>. '}${qData.exp}</span>`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= QUIZZES[currentQuiz].questions.length) showResult();
+  else renderQuestion();
+}
+
+function showResult() {
+  const q = QUIZZES[currentQuiz];
+  const pct = Math.round((score / q.questions.length) * 100);
+  document.getElementById('main-content').innerHTML = `
+    <div class="result-screen">
+      <span class="result-icon">${q.icon}</span>
+      <h2>Quiz abgeschlossen!</h2>
+      <div class="result-score">${score} / ${q.questions.length}</div>
+      <p class="result-msg">${q.msg(pct)}</p>
+      <div class="name-input-box">
+        <label>Dein Name für die Bestenliste</label>
+        <input type="text" id="player-name" placeholder="Name eingeben..." maxlength="20" />
+      </div>
+      <div class="controls" style="margin-bottom:32px;">
+        <button class="btn-primary-${q.color}" id="submit-btn" onclick="submitScore()">🏆 Score eintragen</button>
+        <button class="btn-secondary" onclick="initQuiz('${currentQuiz}')">↺ Nochmal</button>
+        <button class="btn-secondary" onclick="goHome()">🏠 Startseite</button>
+      </div>
+      <div id="lb-section"><div class="lb-loading">Lade Bestenliste…</div></div>
+    </div>`;
+  loadAndShow('lb-section');
+}
+
+async function getLeaderboard() {
+  try {
+    const b = BIN[currentQuiz];
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${b.id}/latest`, { headers: { 'X-Master-Key': b.key } });
+    const data = await r.json();
+    return data.record.leaderboard || [];
+  } catch { return []; }
+}
+
+async function saveScore(name, pts) {
+  try {
+    const b = BIN[currentQuiz];
+    const entries = await getLeaderboard();
+    entries.push({ name, score: pts, total: QUIZZES[currentQuiz].questions.length, date: new Date().toLocaleDateString('de-DE') });
+    entries.sort((a,b) => b.score - a.score);
+    const top = entries.slice(0, 20);
+    await fetch(`https://api.jsonbin.io/v3/b/${b.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': b.key },
+      body: JSON.stringify({ leaderboard: top })
+    });
+    return top;
+  } catch { return []; }
+}
+
+async function submitScore() {
+  const nameEl = document.getElementById('player-name');
+  const name = nameEl?.value.trim();
+  if (!name) { nameEl.style.borderColor = 'var(--wrong)'; return; }
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Wird gespeichert…';
+  const entries = await saveScore(name, score);
+  btn.textContent = '✓ Eingetragen!';
+  renderLB(document.getElementById('lb-section'), entries);
+}
+
+async function loadAndShow(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const entries = await getLeaderboard();
+  renderLB(el, entries);
+}
+
+function renderLB(el, entries) {
+  if (!entries.length) {
+    el.innerHTML = `<div class="leaderboard"><div class="lb-title">🏆 Bestenliste</div><div class="lb-empty">Noch keine Einträge – sei der Erste!</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="leaderboard">
+    <div class="lb-title">🏆 Bestenliste</div>
+    ${entries.map((e,i) => `
+      <div class="lb-item ${i<3?'rank-'+(i+1):''}">
+        <span class="lb-rank">${i<3?MEDALS[i]:'#'+(i+1)}</span>
+        <span class="lb-name">${e.name}</span>
+        <span class="lb-score">${e.score}/${e.total}<span class="lb-pct"> (${Math.round(e.score/e.total*100)}%)</span></span>
+      </div>`).join('')}
+  </div>`;
+}
+
+async function initLeaderboard(type) {
+  currentQuiz = type;
+  const q = QUIZZES[type];
+  document.getElementById('home').style.display = 'none';
+  const hdr = document.getElementById('quiz-header');
+  hdr.classList.add('show');
+  document.getElementById('hdr-subtitle').textContent = q.sublabel;
+  document.getElementById('hdr-subtitle').className = 'subtitle ' + q.color;
+  document.getElementById('hdr-title').innerHTML = `${q.label} – Bestenliste`;
+  document.getElementById('quiz-main').classList.add('show');
+  document.getElementById('main-content').innerHTML = `
+    <div id="lb-section" style="max-width:600px;margin:0 auto;">
+      <div class="lb-loading">Lade Bestenliste…</div>
+    </div>
+    <div style="text-align:center;margin-top:28px;">
+      <button class="btn-primary-${q.color}" onclick="initQuiz('${type}')">▶ Quiz starten</button>
+      <button class="btn-secondary" style="margin-left:12px;" onclick="goHome()">🏠 Startseite</button>
+    </div>`;
+  loadAndShow('lb-section');
+}
+</script>
+</body>
+</html>
