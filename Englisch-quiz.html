@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School Renovation Quiz</title>
+<style>
+  :root{
+    --paper:#F6F8F4; --panel:#FFFFFF; --ink:#16281D; --ink-soft:#4E6157;
+    --line:#DCE5DD; --green:#2F7D46; --green-deep:#1F5A31;
+    --wrong:#C24634; --right:#2F7D46;
+    --shadow:0 1px 2px rgba(22,40,29,.06),0 8px 24px rgba(22,40,29,.06);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+  .wrap{max-width:680px;margin:0 auto;padding:22px 18px 40px;min-height:100vh}
+
+  .eyebrow{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--green);font-weight:700;margin:0 0 10px}
+  h1{font-size:clamp(1.9rem,7vw,2.8rem);line-height:1.03;margin:0 0 12px;font-weight:800;letter-spacing:-.02em}
+
+  .screen{display:none;animation:fade .18s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* MENU */
+  .menu-hero{border-bottom:2px solid var(--ink);padding:16px 2px 24px;margin-bottom:26px}
+  .menu-hero p{margin:0;color:var(--ink-soft);max-width:44ch}
+  .tile{display:flex;align-items:center;gap:16px;text-align:left;width:100%;
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:22px 20px;box-shadow:var(--shadow);cursor:pointer;transition:border-color .12s,transform .08s}
+  .tile:hover{border-color:var(--green)}
+  .tile:active{transform:translateY(1px)}
+  .tile .ic{flex:0 0 auto;width:46px;height:46px;border-radius:12px;background:#EEF7EF;
+    display:grid;place-items:center;font-size:1.5rem}
+  .tile .lab{font-weight:800;font-size:1.18rem;margin:0}
+
+  /* TOP BAR */
+  .topbar{display:flex;align-items:center;gap:12px;margin:0 0 20px}
+  .back{background:none;border:none;color:var(--green);font-weight:800;font-size:.95rem;
+    cursor:pointer;padding:6px 4px;display:inline-flex;align-items:center;gap:6px}
+  .back:hover{color:var(--green-deep)}
+  .progress-txt{margin-left:auto;font-size:.82rem;font-weight:700;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .pbar{height:6px;background:var(--line);border-radius:999px;overflow:hidden;margin:0 0 22px}
+  .pbar span{display:block;height:100%;background:var(--green);width:0;transition:width .25s ease}
+
+  .sec-label{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);font-weight:800;margin:0 0 8px}
+  .ask{font-weight:800;font-size:1.28rem;line-height:1.25;margin:0 0 20px;letter-spacing:-.01em}
+
+  .opt{display:block;margin:0 0 10px;cursor:pointer}
+  .opt .box{display:flex;gap:12px;align-items:flex-start;background:var(--panel);
+    border:1.5px solid var(--line);border-radius:12px;padding:14px 14px;transition:border-color .12s,background .12s}
+  .opt .tick{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1.5px solid #C3CFC5;
+    display:grid;place-items:center;font-size:.75rem;font-weight:800;color:#fff;margin-top:1px}
+  .opt .txt{font-size:1rem}
+  .opt:hover .box{border-color:var(--green)}
+  .tag{margin-left:auto;font-size:.72rem;font-weight:800;letter-spacing:.04em;align-self:center}
+  .tag.ok{color:var(--right)} .tag.no{color:var(--wrong)}
+  .locked .opt{cursor:default;pointer-events:none}
+  .opt.correct .box{border-color:var(--right);background:#EEF7EF}
+  .opt.correct .tick{background:var(--right);border-color:var(--right)}
+  .opt.wrong .box{border-color:var(--wrong);background:#FBEEEC}
+  .opt.wrong .tick{background:var(--wrong);border-color:var(--wrong)}
+
+  .nav{display:flex;gap:12px;margin-top:24px}
+  button.btn{font:inherit;font-weight:800;cursor:pointer;border:none;background:var(--green);color:#fff;
+    padding:14px 24px;border-radius:999px;box-shadow:var(--shadow);transition:transform .08s,background .12s,opacity .12s}
+  button.btn:hover{background:var(--green-deep)}
+  button.btn:active{transform:translateY(1px)}
+  button.btn:disabled{opacity:.4;cursor:not-allowed;background:var(--green)}
+  button.btn.ghost{background:transparent;color:var(--green);border:1.5px solid var(--green);box-shadow:none}
+  button.btn.ghost:hover{background:#F1F7F1;color:var(--green-deep)}
+  .nav .spacer{flex:1}
+
+  /* RESULT */
+  .result-card{background:var(--ink);color:#fff;border-radius:18px;padding:26px 22px;box-shadow:var(--shadow);text-align:center;margin-bottom:20px}
+  .result-card .big{font-size:3.2rem;font-weight:800;line-height:1;margin:6px 0 6px;font-variant-numeric:tabular-nums}
+  .result-card p{margin:0;color:#C9D8CD}
+
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== MENU ===== -->
+  <section class="screen active" id="menu">
+    <div class="menu-hero">
+      <p class="eyebrow">English Quiz · School Tour</p>
+      <h1>The School Renovation Quiz</h1>
+      <p>Test what you remember about the new cafeteria, greenhouse, manga and classrooms.</p>
+    </div>
+    <button class="tile" onclick="startQuiz()">
+      <span class="ic">✏️</span>
+      <span class="lab">Start quiz</span>
+    </button>
+  </section>
+
+  <!-- ===== QUIZ ===== -->
+  <section class="screen" id="quiz">
+    <div class="topbar">
+      <button class="back" onclick="quizBack()">‹ <span id="backLabel">Menu</span></button>
+      <span class="progress-txt" id="progTxt"></span>
+    </div>
+    <div class="pbar"><span id="pbarFill"></span></div>
+    <p class="sec-label" id="secLabel"></p>
+    <h2 class="ask" id="askText"></h2>
+    <div id="optWrap"></div>
+    <div class="nav">
+      <div class="spacer"></div>
+      <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Next ›</button>
+    </div>
+  </section>
+
+  <!-- ===== RESULT ===== -->
+  <section class="screen" id="result">
+    <div class="topbar"><button class="back" onclick="goMenu()">‹ Menu</button></div>
+    <div class="result-card">
+      <p class="eyebrow" style="color:#9ec9a9">Your result</p>
+      <div class="big"><span id="rNum">0</span>/<span id="rMax">0</span></div>
+      <p id="rMsg"></p>
+    </div>
+    <div class="nav">
+      <button class="btn ghost" onclick="startQuiz()">Play again</button>
+      <div class="spacer"></div>
+      <button class="btn" onclick="goMenu()">Menu</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   ANSWER KEY — EDIT THIS!
+   a: index of the correct option (0 = first, 1 = second, 2 = third)
+   I guessed based on the story; change any that are wrong.
+   ========================================================= */
+const QUIZ = [
+  { title:"The Cafeteria", questions:[
+    { q:"Where will the new cafeteria be built?", o:["in the Atrium","in the garden","in an old classroom"], a:1 },
+    { q:"How many cash registers will the cafeteria have?", o:["1","5","2"], a:2 },
+    { q:"What will be placed outside the cafeteria?", o:["a little nature","a pool","chairs"], a:2 },
+    { q:"What feature will allow students to enjoy the view of nature?", o:["a large glass front","a balcony","a scope next to the table"], a:0 },
+    { q:"What might be added to the garden near the cafeteria?", o:["a basketball hoop","a pond","an aquarium"], a:1 },
+    { q:"How will students be protected from the sun on hot days?", o:["sunscreen","a roof","a tree"], a:2 },
+  ]},
+  { title:"The Greenhouse", questions:[
+    { q:"What will replace the green classroom?", o:["a huge glass dome","a new modern classroom for biology","a new garden"], a:0 },
+    { q:"Which school subject would benefit from the greenhouse?", o:["Chemistry","Biology","Physics"], a:2 },
+    { q:"How would the greenhouse make lessons more exciting?", o:["because of the plants","because of the chairs and tables","because the biology lessons would take place there"], a:2 },
+    { q:"What could the school do with the fruit and vegetables it produces?", o:["sell them","give them away","eat them"], a:0 },
+    { q:"How much could the fresh vegetables cost?", o:["very expensive","5 € each","very cheap"], a:2 },
+    { q:"Why might the school not be able to afford the greenhouse?", o:["because it's too ugly","because it's too expensive","because the students don't want it"], a:1 },
+  ]},
+  { title:"The Manga", questions:[
+    { q:"How much did the chapel change since then?", o:["not so much","everything","nothing – everything is the same"], a:0 },
+    { q:"What did the characters visit in the school?", o:["the stairwell, the garden, the gym","the cafeteria, a classroom, the Atrium","the stairwell, the new cafeteria, the chapel"], a:2 },
+  ]},
+  { title:"The Classrooms", questions:[
+    { q:"Why are classrooms so important?", o:["because students spend a lot of time there","because people want to play table tennis there","because of the examinations"], a:0 },
+    { q:"What modern equipment do the classrooms already have?", o:["tablets","whiteboards","power outlets"], a:1 },
+    { q:"What is wrong with the tables?", o:["the tables are too small","the tables are damaged and covered with stickers","the tables are only damaged"], a:1 },
+    { q:"What would each new table have on it?", o:["a little plant","a tablet","a free paper"], a:0 },
+    { q:"Why would students need power outlets in the tables?", o:["for the students' phones","for the school tablets","for laptops"], a:1 },
+  ]},
+];
+
+const FLAT = [];
+QUIZ.forEach(sec => sec.questions.forEach(q => FLAT.push({...q, section: sec.title})));
+const TOTAL = FLAT.length;
+
+let idx = 0, picks = [];
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function goMenu(){ show('menu'); }
+
+function startQuiz(){
+  idx = 0; picks = new Array(TOTAL).fill(null);
+  renderQuestion(); show('quiz');
+}
+
+function renderQuestion(){
+  const item = FLAT[idx];
+  document.getElementById('secLabel').textContent = item.section;
+  document.getElementById('askText').textContent = item.q;
+  document.getElementById('progTxt').textContent = `Question ${idx+1} of ${TOTAL}`;
+  document.getElementById('pbarFill').style.width = (idx/TOTAL*100) + "%";
+  document.getElementById('backLabel').textContent = idx === 0 ? "Menu" : "Back";
+
+  const wrap = document.getElementById('optWrap');
+  const answered = picks[idx] !== null;
+  wrap.className = answered ? 'locked' : '';
+  wrap.innerHTML = item.o.map((text, oi) => {
+    let cls = 'opt';
+    if (answered){
+      if (oi === item.a) cls += ' correct';
+      else if (oi === picks[idx]) cls += ' wrong';
+    }
+    let tag = '';
+    if (answered && oi === item.a) tag = '<span class="tag ok">correct</span>';
+    else if (answered && oi === picks[idx] && oi !== item.a) tag = '<span class="tag no">your pick</span>';
+    return `<label class="${cls}" onclick="pick(${oi})">
+        <span class="box">
+          <span class="tick">${String.fromCharCode(97+oi)}</span>
+          <span class="txt">${text}</span>${tag}
+        </span></label>`;
+  }).join('');
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = (idx === TOTAL-1) ? "See result ›" : "Next ›";
+  nextBtn.disabled = !answered;
+}
+
+function pick(oi){
+  if (picks[idx] !== null) return;
+  picks[idx] = oi; renderQuestion();
+}
+function nextQuestion(){
+  if (picks[idx] === null) return;
+  if (idx < TOTAL-1){ idx++; renderQuestion(); } else finishQuiz();
+}
+function quizBack(){
+  if (idx === 0) goMenu(); else { idx--; renderQuestion(); }
+}
+
+function finishQuiz(){
+  const score = picks.reduce((s,p,i)=> s + (p === FLAT[i].a ? 1 : 0), 0);
+  const pct = Math.round(score/TOTAL*100);
+  document.getElementById('rNum').textContent = score;
+  document.getElementById('rMax').textContent = TOTAL;
+  let msg;
+  if (pct === 100) msg = "Perfect score — flawless!";
+  else if (pct >= 70) msg = "Strong work!";
+  else if (pct >= 40) msg = "Not bad — try again to beat it.";
+  else msg = "Keep going, you'll get there.";
+  document.getElementById('rMsg').textContent = `${pct}%  ·  ${msg}`;
+  show('result');
+}
+</script>
+</body>
+</html>
